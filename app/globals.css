@@ -45,7 +45,7 @@
   --bezel-shadow: #000000;        /* Outer bezel drop shadow */
 
   /* === CRT Overlay Tuning === */
-  --scanline-opacity: 0.08;
+  --scanline-opacity: 0.04;
   --vignette-strength: 0.4;
   --noise-opacity: 0.03;
 

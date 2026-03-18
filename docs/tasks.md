@@ -33,29 +33,29 @@
 - [ ] Test start page layout and animations
 
 ## Phase 3 — Fluid Simulation + Dither Shader
-- [ ] Set up WebGL 2.0 context creation utility (`lib/webgl/createProgram.ts`)
-- [ ] Build framebuffer management utilities (`lib/webgl/framebuffer.ts`)
-- [ ] Build texture creation helpers (`lib/webgl/textures.ts`)
-- [ ] Write shared fullscreen quad vertex shader (`vertex.glsl`)
-- [ ] Implement splat shader — inject velocity + dye at mouse position
-- [ ] Implement advection shader — move fluid along velocity field
-- [ ] Implement divergence shader — compute velocity divergence
-- [ ] Implement pressure shader — Jacobi iterative solver
-- [ ] Implement gradient subtraction shader — make velocity divergence-free
-- [ ] Build `FluidSimulation.tsx` — orchestrates sim loop, manages FBOs
-- [ ] Add mouse/touch interaction — track drag delta, inject splats
+- [x] Set up WebGL 2.0 context creation utility (`lib/webgl/createProgram.ts`)
+- [x] Build framebuffer management utilities (`lib/webgl/framebuffer.ts`)
+- [x] Build texture creation helpers (`lib/webgl/textures.ts`)
+- [x] Write shared fullscreen quad vertex shader (`vertex.glsl`)
+- [x] Implement splat shader — inject velocity + dye at mouse position
+- [x] Implement advection shader — move fluid along velocity field
+- [x] Implement divergence shader — compute velocity divergence
+- [x] Implement pressure shader — Jacobi iterative solver
+- [x] Implement gradient subtraction shader — make velocity divergence-free
+- [x] Build `FluidSimulation.tsx` — orchestrates sim loop, manages FBOs
+- [x] Add mouse/touch interaction — track drag delta, inject splats
 - [ ] Verify fluid sim runs at 60fps at 1/4 resolution
-- [ ] Write Bayer 8x8 ordered dithering fragment shader (`dither.glsl`)
-- [ ] Build `DitherPostProcess.tsx` — chains dither pass after fluid output
+- [x] Write Bayer 8x8 ordered dithering fragment shader (`dither.glsl`)
+- [x] Build `DitherPostProcess.tsx` — chains dither pass after fluid output (folded into `useFluidSim`)
 - [ ] Tune dither scale (start at 3.0, adjust visually)
-- [ ] Add CRT post-process pass (scanlines + noise in shader)
-- [ ] Add barrel distortion as final shader pass
-- [ ] Wire fluid sim + dither + CRT into Start Page background
+- [x] Add CRT post-process pass (scanlines + noise in shader)
+- [x] Add barrel distortion as final shader pass
+- [x] Wire fluid sim + dither + CRT into Start Page background
 - [ ] Ensure text/button layers are NOT affected by fluid sim
-- [ ] Check `EXT_color_buffer_float` support, add fallback path
-- [ ] Implement mobile detection → static dithered background fallback
+- [x] Check `EXT_color_buffer_float` support, add fallback path
+- [x] Implement mobile detection → static dithered background fallback
 - [ ] Performance profiling — GPU usage, frame timing
-- [ ] Handle `webglcontextlost` and `webglcontextrestored` events
+- [x] Handle `webglcontextlost` and `webglcontextrestored` events
 - [ ] Test on Chrome, Firefox, Safari, Edge
 
 ## Phase 4 — Home Page Sections
@@ -73,7 +73,7 @@
 - [ ] Add looping video support (webm primary, mp4 fallback, muted, autoplay)
 - [ ] Build `ProjectGrid` — layout of project cards
 - [ ] Build `ProjectsSection` — section title + project grid
-- [ ] Project card click navigates to `/projects/[slug]`
+- [ ] Project carokd click navigates to `/projects/[slug]`
 - [ ] Build `EducationSection` — timeline or card layout, scramble-in
 - [ ] Build `ContactSection` — links, email, social (no scramble/blur)
 - [ ] Populate `config/projects.ts` with placeholder project data

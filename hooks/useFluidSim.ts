@@ -20,6 +20,7 @@ import { divergenceFragSrc } from '@/lib/webgl/shaders/divergence';
 import { pressureFragSrc } from '@/lib/webgl/shaders/pressure';
 import { gradientFragSrc } from '@/lib/webgl/shaders/gradient';
 import { ditherFragSrc } from '@/lib/webgl/shaders/dither';
+import { crtFragSrc } from '@/lib/webgl/shaders/crt';
 import { barrelFragSrc } from '@/lib/webgl/shaders/barrel';
 
 interface UseFluidSimOptions {
@@ -44,18 +45,19 @@ interface Programs {
   pressure: ShaderProgram;
   gradient: ShaderProgram;
   dither: ShaderProgram;
+  crt: ShaderProgram;
   barrel: ShaderProgram;
 }
 
 export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
   const {
-    simResolutionDivisor = 4,
+    simResolutionDivisor = 8,
     pressureIterations = 25,
     velocityDissipation = 0.98,
     dyeDissipation = 0.97,
     splatRadius = 0.0025,
     barrelStrength = 0.12,
-    ditherScale = 3.0,
+    ditherScale = 4.0,
   } = options ?? {};
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -67,6 +69,8 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
   const dyeRef = useRef<DoubleFBO | null>(null);
   const divergenceRef = useRef<SingleFBO | null>(null);
   const ditherFBORef = useRef<SingleFBO | null>(null);
+  const crtFBORef = useRef<SingleFBO | null>(null);
+  const startTimeRef = useRef<number>(0);
   const programsRef = useRef<Programs | null>(null);
   const quadBufferRef = useRef<WebGLBuffer | null>(null);
   const [isMobileFallback, setIsMobileFallback] = useState(false);
@@ -132,6 +136,7 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
           'uTexelSize',
         ]),
         dither: createProgram(gl, vertexShaderSrc, ditherFragSrc, ['uSource', 'uDitherScale']),
+        crt: createProgram(gl, vertexShaderSrc, crtFragSrc, ['uSource', 'uTime']),
         barrel: createProgram(gl, vertexShaderSrc, barrelFragSrc, ['uSource', 'uDistortion']),
       };
     }
@@ -159,12 +164,14 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
       if (dyeRef.current) deleteDoubleFBO(gl, dyeRef.current);
       if (divergenceRef.current) deleteSingleFBO(gl, divergenceRef.current);
       if (ditherFBORef.current) deleteSingleFBO(gl, ditherFBORef.current);
+      if (crtFBORef.current) deleteSingleFBO(gl, crtFBORef.current);
 
       velocityRef.current = createDoubleFBO(gl, simW, simH, gl.RG16F, gl.RG, gl.HALF_FLOAT, gl.LINEAR);
       pressureRef.current = createDoubleFBO(gl, simW, simH, gl.R16F, gl.RED, gl.HALF_FLOAT, gl.NEAREST);
       dyeRef.current = createDoubleFBO(gl, simW, simH, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT, gl.LINEAR);
       divergenceRef.current = createSingleFBO(gl, simW, simH, gl.R16F, gl.RED, gl.HALF_FLOAT, gl.NEAREST);
       ditherFBORef.current = createSingleFBO(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
+      crtFBORef.current = createSingleFBO(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
     }
 
     function resize() {
@@ -186,6 +193,7 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
 
       const dt = Math.min((now - lastTime) / 1000, 0.016);
       lastTime = now;
+      const elapsed = (now - startTimeRef.current) / 1000.0;
 
       const progs = programsRef.current;
       const quad = quadBufferRef.current;
@@ -196,7 +204,8 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
       const dye = dyeRef.current;
       const div = divergenceRef.current;
       const ditherFBO = ditherFBORef.current;
-      if (!vel || !pres || !dye || !div || !ditherFBO) return;
+      const crtFBO = crtFBORef.current;
+      if (!vel || !pres || !dye || !div || !ditherFBO || !crtFBO) return;
 
       const simW = vel.width;
       const simH = vel.height;
@@ -329,11 +338,20 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
       gl.uniform1f(progs.dither.uniforms.uDitherScale, ditherScale);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-      // --- BARREL PASS: ditherFBO → canvas ---
+      // --- CRT COMPOSITE PASS: ditherFBO → crtFBO ---
+      gl.useProgram(progs.crt.program);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, crtFBO.fbo);
+      bindTexture(gl, 0, ditherFBO.texture);
+      gl.uniform1i(progs.crt.uniforms.uSource, 0);
+      gl.uniform1f(progs.crt.uniforms.uTime, elapsed);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      // --- BARREL PASS: crtFBO → canvas ---
       gl.useProgram(progs.barrel.program);
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      bindTexture(gl, 0, ditherFBO.texture);
+      bindTexture(gl, 0, crtFBO.texture);
       gl.uniform1i(progs.barrel.uniforms.uSource, 0);
       gl.uniform1f(progs.barrel.uniforms.uDistortion, barrelStrength);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -344,6 +362,7 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
 
     function startLoop() {
       lastTime = performance.now();
+      startTimeRef.current = performance.now();
       frameIdRef.current = requestAnimationFrame(render);
     }
 
@@ -421,7 +440,8 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
     canvas.addEventListener('touchstart', onTouchStart, { passive: false });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
     canvas.addEventListener('touchend', onTouchEnd);
-    window.addEventListener('resize', resize);
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(canvas);
     canvas.addEventListener('webglcontextlost', onContextLost);
     canvas.addEventListener('webglcontextrestored', onContextRestored);
 
@@ -450,6 +470,10 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
         deleteSingleFBO(gl, ditherFBORef.current);
         ditherFBORef.current = null;
       }
+      if (crtFBORef.current) {
+        deleteSingleFBO(gl, crtFBORef.current);
+        crtFBORef.current = null;
+      }
       if (programsRef.current) {
         Object.values(programsRef.current).forEach((sp) => deleteProgram(gl, sp));
         programsRef.current = null;
@@ -465,7 +489,7 @@ export function useFluidSim(options?: UseFluidSimOptions): UseFluidSimReturn {
       canvas.removeEventListener('touchstart', onTouchStart);
       canvas.removeEventListener('touchmove', onTouchMove);
       canvas.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('resize', resize);
+      ro.disconnect();
       canvas.removeEventListener('webglcontextlost', onContextLost);
       canvas.removeEventListener('webglcontextrestored', onContextRestored);
     };
