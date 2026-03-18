@@ -63,5 +63,6 @@ types/
 ### Skills
 
 Detailed implementation specs live in `.claude/skills/`:
-- `crt-effects/SKILLS.md` — color palette rules, bezel/screen CSS, overlay specs, power transition timing, mobile behavior
+- `crt-effects/SKILLS.md` — color palette rules, bezel/screen CSS, overlay specs, power transition timing, mobile behavq
+aqaior
 - `webgl-shaders/SKILLS.md` — render pipeline order, FBO patterns, GLSL conventions, fluid sim parameters, dither shader, common pitfalls
