@@ -6,7 +6,7 @@ interface CRTFrameProps {
 
 export function CRTFrame({ children }: CRTFrameProps) {
   return (
-    <div className="crt-bezel min-h-screen">
+    <div className="crt-bezel">
       <CRTScreen>{children}</CRTScreen>
     </div>
   );

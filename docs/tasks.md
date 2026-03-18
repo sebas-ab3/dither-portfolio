@@ -59,27 +59,27 @@
 - [ ] Test on Chrome, Firefox, Safari, Edge
 
 ## Phase 4 — Home Page Sections
-- [ ] Build `SectionWrapper` component with Intersection Observer (threshold 0.5)
-- [ ] Wire scramble text trigger on section entering majority view
-- [ ] Wire blur-out transition on section leaving majority view (Framer Motion)
-- [ ] Ensure Contact section is exempt from scramble/blur
-- [ ] Build `Navbar` component — fixed top, CRT styled
-- [ ] Add "Exit" button (left) → navigates to start page
-- [ ] Add section links (Hero, Skills, Projects, Education/Experience, Contact)
-- [ ] Navbar section click scrolls to section + triggers scramble
-- [ ] Build `HeroSection` — name, tagline, scramble-in animation
-- [ ] Build `SkillsSection` — skill categories/tags, scramble-in
-- [ ] Build `ProjectCard` component — title, video, description, tech tags
-- [ ] Add looping video support (webm primary, mp4 fallback, muted, autoplay)
-- [ ] Build `ProjectGrid` — layout of project cards
-- [ ] Build `ProjectsSection` — section title + project grid
-- [ ] Project carokd click navigates to `/projects/[slug]`
-- [ ] Build `EducationSection` — timeline or card layout, scramble-in
-- [ ] Build `ContactSection` — links, email, social (no scramble/blur)
-- [ ] Populate `config/projects.ts` with placeholder project data
-- [ ] Test scroll behavior across all sections
-- [ ] Test navbar scroll + scramble trigger
-- [ ] Verify blur transitions feel smooth (timing, easing)
+- [x] Build `SectionWrapper` component with Intersection Observer (threshold 0.5)
+- [x] Wire scramble text trigger on section entering majority view
+- [x] Wire blur-out transition on section leaving majority view (Framer Motion)
+- [x] Ensure Contact section is exempt from scramble/blur
+- [x] Build `Navbar` component — fixed top, CRT styled
+- [x] Add "Exit" button (left) → navigates to start page
+- [x] Add section links (Hero, Skills, Projects, Education/Experience, Contact)
+- [x] Navbar section click scrolls to section + triggers scramble
+- [x] Build `HeroSection` — name, tagline, scramble-in animation
+- [x] Build `SkillsSection` — skill categories/tags, scramble-in
+- [x] Build `ProjectCard` component — title, video, description, tech tags
+- [x] Add looping video support (webm primary, mp4 fallback, muted, autoplay)
+- [x] Build `ProjectGrid` — layout of project cards
+- [x] Build `ProjectsSection` — section title + project grid
+- [x] Project carokd click navigates to `/projects/[slug]`
+- [x] Build `EducationSection` — timeline or card layout, scramble-in
+- [x] Build `ContactSection` — links, email, social (no scramble/blur)
+- [x] Populate `config/projects.ts` with placeholder project data
+- [x] Test scroll behavior across all sections
+- [x] Test navbar scroll + scramble trigger
+- [x] Verify blur transitions feel smooth (timing, easing)
 
 ## Phase 5 — Transitions & Polish
 - [ ] Build `CRTPowerTransition` component

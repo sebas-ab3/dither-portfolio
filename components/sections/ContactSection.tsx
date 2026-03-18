@@ -1,4 +1,6 @@
 'use client';
+import { useSectionActive } from '@/components/sections/SectionWrapper';
+import { ScrambleText } from '@/components/text/ScrambleText';
 
 const LINKS = [
   { label: 'EMAIL', href: 'mailto:hello@example.com', display: 'hello@example.com' },
@@ -7,14 +9,16 @@ const LINKS = [
 ];
 
 export function ContactSection() {
+  const { active } = useSectionActive();
   return (
     <div className="flex min-h-screen flex-col justify-center px-8 py-24">
-      <h2
+      <ScrambleText
+        as="h2"
+        text="// CONTACT"
+        active={active}
         className="font-vt323 mb-12 text-4xl tracking-widest"
         style={{ color: 'var(--crt-red-bright)', textShadow: 'var(--crt-glow-heading)' }}
-      >
-        // CONTACT
-      </h2>
+      />
       <div className="flex flex-col gap-4">
         {LINKS.map(({ label, href, display }) => (
           <a
@@ -25,7 +29,11 @@ export function ContactSection() {
             className="font-vt323 text-2xl tracking-wide"
             style={{ color: 'var(--crt-red-medium)' }}
           >
-            &gt; {label} — {display}
+            <ScrambleText
+              as="span"
+              text={`> ${label} — ${display}`}
+              active={active}
+            />
           </a>
         ))}
       </div>

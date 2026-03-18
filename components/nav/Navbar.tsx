@@ -17,28 +17,42 @@ export function Navbar() {
   const router = useRouter();
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3"
-      style={{
-        borderBottom: '1px solid var(--crt-red-muted)',
-        background: 'rgba(10, 10, 10, 0.95)',
-      }}
+      className="sticky top-0 z-50 grid grid-cols-6"
+      style={{ background: 'var(--crt-red-bright)' }}
     >
-      <button type="button" className="crt-btn text-sm" onClick={() => router.push('/')}>
+      {SECTIONS.map(({ id, label }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => scrollTo(id)}
+          className="font-vt323 tracking-widest text-sm py-3 w-full"
+          style={{
+            color: 'var(--crt-bg-base)',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+        >
+          {label}
+        </button>
+      ))}
+      <button
+        type="button"
+        onClick={() => router.push('/')}
+        className="font-vt323 tracking-widest text-sm py-3 w-full"
+        style={{
+          color: 'var(--crt-bg-base)',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+      >
         [ EXIT ]
       </button>
-      <div className="flex gap-6">
-        {SECTIONS.map(({ id, label }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => scrollTo(id)}
-            className="font-vt323 text-sm tracking-widest transition-colors hover:text-[var(--crt-red-bright)]"
-            style={{ color: 'var(--crt-red-dim)', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
     </nav>
   );
 }
