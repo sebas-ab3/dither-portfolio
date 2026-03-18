@@ -251,6 +251,49 @@ a:focus-visible {
 
 
 /* ============================================
+   UI COMPONENTS
+   ============================================ */
+
+.crt-btn {
+  border: 1px solid var(--crt-red-dim);
+  color: var(--crt-red-dim);
+  background: transparent;
+  padding: 0.75rem 2rem;
+  letter-spacing: 0.3em;
+  cursor: pointer;
+  font-family: var(--font-vt323);
+  transition:
+    border-color 200ms ease,
+    color 200ms ease,
+    text-shadow 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.crt-btn:hover {
+  border-color: var(--crt-red-bright);
+  color: var(--crt-red-bright);
+  text-shadow: var(--crt-glow-strong);
+  box-shadow:
+    0 0 12px rgba(255, 32, 32, 0.3),
+    inset 0 0 12px rgba(255, 32, 32, 0.05);
+}
+
+.crt-btn:focus-visible {
+  outline: 1px solid var(--crt-red-dim);
+  outline-offset: 4px;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: cursorBlink 1s steps(1) infinite;
+}
+
+
+/* ============================================
    SCROLLBAR (keep it on-brand)
    ============================================ */
 

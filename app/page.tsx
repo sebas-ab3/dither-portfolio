@@ -1,18 +1,22 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { BootSequence } from '@/components/text/BootSequence';
+import { ASCIITitle } from '@/components/text/ASCIITitle';
+
 export default function StartPage() {
+  const router = useRouter();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-8">
-      <p className="text-crt-red-dim text-xl tracking-widest">
-        ████████████████████████████████
-      </p>
-      <p className="text-crt-red-bright text-4xl tracking-widest">
-        &gt; INITIALIZING...
-      </p>
-      <p className="text-crt-red-medium text-lg tracking-wider">
-        SYSTEM READY. AWAITING INPUT.
-      </p>
-      <p className="text-crt-red-dim text-xl tracking-widest">
-        ████████████████████████████████
-      </p>
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-10 p-8">
+      <BootSequence />
+      <ASCIITitle />
+      <button
+        className="crt-btn text-lg"
+        onClick={() => router.push('/home')}
+      >
+        [ ENTER ]
+      </button>
     </main>
   );
 }

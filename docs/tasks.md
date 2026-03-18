@@ -2,34 +2,34 @@
 
 ## Phase 1 — Foundation & CRT Shell
 - [x] Initialize Next.js 16 with TypeScript, Tailwind v4, App Router
-- [ ] Set up VT323 font via `next/font/google` with fallback stack
+- [x] Set up VT323 font via `next/font/google` with fallback stack
 - [x] Set up color palette as CSS variables in globals.css
-- [ ] Configure Tailwind `@theme` to expose CRT CSS variables as utility classes
-- [ ] Build `CRTFrame` component — bezel, padding, outer shadows
-- [ ] Build `CRTScreen` component — rounded screen area, overflow hidden
+- [x] Configure Tailwind `@theme` to expose CRT CSS variables as utility classes
+- [x] Build `CRTFrame` component — bezel, padding, outer shadows
+- [x] Build `CRTScreen` component — rounded screen area, overflow hidden
 - [x] Build scanline overlay (CSS repeating-linear-gradient, pointer-events none)
 - [x] Build vignette overlay (CSS radial-gradient)
 - [x] Build noise overlay (tiling texture + CSS steps animation)
-- [ ] Build `GlossyReflection` component — static arc layer
-- [ ] Add `useMouseParallax` hook for reactive gloss layer
-- [ ] Wire glossy reflection mouse reactivity
+- [x] Build `GlossyReflection` component — static arc layer
+- [x] Add `useMouseParallax` hook for reactive gloss layer
+- [x] Wire glossy reflection mouse reactivity
 - [x] Create page routing: `/` (start page), `/home`, `/projects/[slug]` — `/` and `/home` exist as placeholders
-- [ ] Create `/projects/[slug]/page.tsx` placeholder
-- [ ] Wrap root layout in CRTFrame so all pages share the monitor shell
+- [x] Create `/projects/[slug]/page.tsx` placeholder
+- [x] Wrap root layout in CRTFrame so all pages share the monitor shell
 - [ ] Test CRT shell renders correctly at multiple viewport sizes
 - [x] Add `prefers-reduced-motion` media query handling
 
 ## Phase 2 — Start Page Core
-- [ ] Build `BootSequence` component — typewriter terminal commands, top-left
-- [ ] Define boot sequence text content (LOADING SYSTEM, INITIALIZING DISPLAY, etc.)
-- [ ] Boot sequence plays once on initial load, then settles
-- [ ] Build `useScrambleText` hook — simultaneous character randomization
-- [ ] Build `ASCIITitle` component — large ASCII art text, centered
-- [ ] Implement title cycling: "Hello World" → "Hello User" → "Hello Seb" → "Hello Employer" → "Hello ___"
-- [ ] Wire scramble transitions between title phrases
-- [ ] Style "Enter" button with CRT aesthetic (red border, glow on hover)
-- [ ] "Enter" button navigates to `/home`
-- [ ] Add placeholder transition between start → home (before full CRT power effect)
+- [x] Build `BootSequence` component — typewriter terminal commands, top-left
+- [x] Define boot sequence text content (LOADING SYSTEM, INITIALIZING DISPLAY, etc.)
+- [x] Boot sequence plays once on initial load, then settles
+- [x] Build `useScrambleText` hook — simultaneous character randomization
+- [x] Build `ASCIITitle` component — large ASCII art text, centered
+- [x] Implement title cycling: "Hello World" → "Hello User" → "Hello Seb" → "Hello Employer" → "Hello ___"
+- [x] Wire scramble transitions between title phrases
+- [x] Style "Enter" button with CRT aesthetic (red border, glow on hover)
+- [x] "Enter" button navigates to `/home`
+- [x] Add placeholder transition between start → home (before full CRT power effect)
 - [ ] Test start page layout and animations
 
 ## Phase 3 — Fluid Simulation + Dither Shader
