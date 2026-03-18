@@ -1,26 +1,314 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-crt-bg-deep:    var(--crt-bg-deep);
+  --color-crt-bg-base:    var(--crt-bg-base);
+  --color-crt-bg-subtle:  var(--crt-bg-subtle);
+  --color-crt-red-bright: var(--crt-red-bright);
+  --color-crt-red-medium: var(--crt-red-medium);
+  --color-crt-red-dim:    var(--crt-red-dim);
+  --color-crt-red-muted:  var(--crt-red-muted);
+  --color-crt-red-ghost:  var(--crt-red-ghost);
+  --color-bezel-dark:     var(--bezel-dark);
+  --color-bezel-edge:     var(--bezel-edge);
+  --font-family-vt323:    var(--font-vt323);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================
+   CRT RED PHOSPHOR PALETTE
+   ============================================
+   This is the ONLY color system for the site.
+   Do not introduce colors outside this palette.
+   ============================================ */
+
+:root {
+  /* === Backgrounds === */
+  --crt-bg-deep: #050505;        /* Deepest black — bezel shadows, outer frame */
+  --crt-bg-base: #0a0a0a;        /* Main screen background */
+  --crt-bg-subtle: #111111;       /* Slightly lifted — cards, surfaces, hover states */
+
+  /* === Red Phosphor Text Hierarchy === */
+  --crt-red-bright: #ff2020;      /* Headings, emphasis, active nav, ASCII art */
+  --crt-red-medium: #cc1a1a;      /* Body text, primary content */
+  --crt-red-dim: #801010;         /* Secondary text, descriptions, inactive items */
+  --crt-red-muted: #401010;       /* Borders, dividers, subtle UI elements */
+  --crt-red-ghost: #200808;       /* Barely visible — deep hover states, faint lines */
+
+  /* === Glow Effects (text-shadow / box-shadow) === */
+  --crt-glow-heading: 0 0 12px rgba(255, 32, 32, 0.6);
+  --crt-glow-text: 0 0 6px rgba(204, 26, 26, 0.3);
+  --crt-glow-strong: 0 0 20px rgba(255, 32, 32, 0.8);
+
+  /* === Bezel === */
+  --bezel-dark: #1a1a1a;          /* Main bezel surface */
+  --bezel-edge: #2a2a2a;          /* Bezel edge highlight */
+  --bezel-shadow: #000000;        /* Outer bezel drop shadow */
+
+  /* === CRT Overlay Tuning === */
+  --scanline-opacity: 0.08;
+  --vignette-strength: 0.4;
+  --noise-opacity: 0.03;
+
+  /* === Barrel Distortion === */
+  --barrel-distortion: 0.15;
+
+  /* === Animation Timing === */
+  --scramble-duration: 1200ms;
+  --blur-transition: 500ms;
+  --power-off-total: 950ms;
+  --power-on-total: 1100ms;
+  --flicker-duration: 4s;
+}
+
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--crt-bg-deep);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--crt-bg-deep);
+  color: var(--crt-red-medium);
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.05em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Default text glow on all body text */
+body {
+  text-shadow: var(--crt-glow-text);
+}
+
+
+/* ============================================
+   CRT TYPOGRAPHY
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--crt-red-bright);
+  text-shadow: var(--crt-glow-heading);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--crt-red-bright);
+  text-decoration: none;
+  transition: text-shadow 0.2s ease;
+}
+
+a:hover {
+  text-shadow: var(--crt-glow-strong);
+}
+
+a:focus-visible {
+  outline: 1px solid var(--crt-red-dim);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--crt-red-muted);
+  color: var(--crt-red-bright);
+}
+
+
+/* ============================================
+   CRT OVERLAYS (shared classes)
+   ============================================ */
+
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 4px
+  );
+}
+
+.crt-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 11;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, var(--vignette-strength)) 100%
+  );
+}
+
+.crt-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9;
+  opacity: var(--noise-opacity);
+  background-image: url('/textures/noise.png');
+  background-repeat: repeat;
+  animation: noiseShift 0.1s steps(4) infinite;
+}
+
+.crt-gloss-static {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: radial-gradient(
+    ellipse at 30% 20%,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 30%,
+    transparent 60%
+  );
+  border-radius: inherit;
+}
+
+.crt-gloss-reactive {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 21;
+  background: radial-gradient(
+    ellipse at 35% 25%,
+    rgba(255, 255, 255, 0.06) 0%,
+    transparent 50%
+  );
+  border-radius: inherit;
+  transition: transform 150ms ease-out;
+}
+
+.crt-screen {
+  background: var(--crt-bg-base);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transform: perspective(1200px) rotateX(0.3deg);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.3);
+}
+
+.crt-bezel {
+  background: var(--bezel-dark);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.05),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(0, 0, 0, 0.9),
+    0 0 120px rgba(0, 0, 0, 0.6);
+}
+
+
+/* ============================================
+   CRT ANIMATIONS
+   ============================================ */
+
+@keyframes noiseShift {
+  0%   { background-position: 0 0; }
+  25%  { background-position: -32px -32px; }
+  50%  { background-position: 16px -48px; }
+  75%  { background-position: -48px 16px; }
+  100% { background-position: 0 0; }
+}
+
+@keyframes screenFlicker {
+  0%   { opacity: 1; }
+  3%   { opacity: 0.85; }
+  6%   { opacity: 1; }
+  45%  { opacity: 1; }
+  48%  { opacity: 0.9; }
+  50%  { opacity: 1; }
+  92%  { opacity: 1; }
+  95%  { opacity: 0.88; }
+  100% { opacity: 1; }
+}
+
+.crt-flicker {
+  animation: screenFlicker var(--flicker-duration) infinite;
+}
+
+
+/* ============================================
+   SCROLLBAR (keep it on-brand)
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--crt-bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--crt-red-muted);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--crt-red-dim);
+}
+
+
+/* ============================================
+   ACCESSIBILITY — REDUCED MOTION
+   ============================================ */
+
+@media (max-width: 768px) {
+  .crt-bezel {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .crt-screen {
+    border-radius: 4px;
+    transform: none;
+    box-shadow: none;
+  }
+  .crt-scanlines { display: none; }
+  .crt-noise { display: none; }
+  .crt-screen .crt-vignette { --vignette-strength: 0.2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-scanlines {
+    display: none;
+  }
+
+  .crt-noise {
+    animation: none;
+  }
+
+  .crt-flicker {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

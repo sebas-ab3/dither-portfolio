@@ -33,9 +33,9 @@ A portfolio website with a retro CRT computer aesthetic featuring ASCII/dither v
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| Framework | **Next.js 14** (App Router) | Routing, SSR/SSG, structure |
+| Framework | **Next.js 16** (App Router) | Routing, SSR/SSG, structure |
 | Language | **TypeScript** | Type safety, project config typing |
-| Styling | **Tailwind CSS** + CSS modules for CRT effects | Utility classes + scoped shader overlays |
+| Styling | **Tailwind CSS v4** + CSS variables in globals.css | Utility classes + scoped shader overlays |
 | Font | **VT323** via `next/font/google` | Retro terminal typography |
 | Fluid Sim | **WebGL 2.0** (custom, based on Pavel Dobryakov's implementation) | Navier-Stokes fluid dynamics on GPU |
 | Dither Shader | **GLSL fragment shader** (Bayer matrix ordered dithering) | Post-process CRT dither effect |
@@ -51,83 +51,78 @@ A portfolio website with a retro CRT computer aesthetic featuring ASCII/dither v
 ## Site Architecture
 
 ```
-src/
-├── app/
-│   ├── layout.tsx              # Root layout — CRT frame wrapper, fonts
-│   ├── page.tsx                # Start Page (fluid sim + ASCII hello)
-│   ├── home/
-│   │   └── page.tsx            # Home Page (all sections)
-│   └── projects/
-│       └── [slug]/
-│           └── page.tsx        # Individual project detail page
+app/
+├── layout.tsx              # Root layout — CRT frame wrapper, fonts
+├── page.tsx                # Start Page (fluid sim + ASCII hello)
+├── home/
+│   └── page.tsx            # Home Page (all sections)
+└── projects/
+    └── [slug]/
+        └── page.tsx        # Individual project detail page
+
+components/
+├── crt/
+│   ├── CRTFrame.tsx        # Bezel frame + glossy overlay + barrel distortion wrapper
+│   ├── CRTScreen.tsx       # Inner screen area with scanlines + vignette
+│   ├── GlossyReflection.tsx # Static arc + mouse-reactive parallax reflection
+│   └── shaders/
+│       ├── barrel.glsl     # Barrel distortion fragment shader
+│       ├── scanlines.glsl  # Scanline overlay
+│       └── vignette.glsl   # Edge darkening
 │
-├── components/
-│   ├── crt/
-│   │   ├── CRTFrame.tsx        # Bezel frame + glossy overlay + barrel distortion wrapper
-│   │   ├── CRTScreen.tsx       # Inner screen area with scanlines + vignette
-│   │   ├── GlossyReflection.tsx # Static arc + mouse-reactive parallax reflection
-│   │   └── shaders/
-│   │       ├── barrel.glsl     # Barrel distortion fragment shader
-│   │       ├── scanlines.glsl  # Scanline overlay
-│   │       └── vignette.glsl   # Edge darkening
-│   │
-│   ├── fluid/
-│   │   ├── FluidSimulation.tsx # WebGL Navier-Stokes fluid sim canvas
-│   │   ├── DitherPostProcess.tsx # Bayer dithering shader applied to fluid output
-│   │   └── shaders/
-│   │       ├── advection.glsl
-│   │       ├── divergence.glsl
-│   │       ├── pressure.glsl
-│   │       ├── gradient.glsl
-│   │       ├── splat.glsl      # Mouse interaction injection
-│   │       └── dither.glsl     # Ordered dithering post-process
-│   │
-│   ├── text/
-│   │   ├── ScrambleText.tsx    # Simultaneous character scramble animation
-│   │   ├── ASCIITitle.tsx      # Large ASCII art text (Hello World/User/Seb/etc.)
-│   │   └── BootSequence.tsx    # Terminal bootup command flicker
-│   │
-│   ├── sections/
-│   │   ├── SectionWrapper.tsx  # Scroll-triggered scramble + blur logic
-│   │   ├── HeroSection.tsx
-│   │   ├── SkillsSection.tsx
-│   │   ├── ProjectsSection.tsx
-│   │   ├── EducationSection.tsx
-│   │   └── ContactSection.tsx  # No scramble/blur
-│   │
-│   ├── projects/
-│   │   ├── ProjectCard.tsx     # Card: title, video, description, tech tags
-│   │   └── ProjectGrid.tsx     # Grid/layout of project cards
-│   │
-│   ├── nav/
-│   │   └── Navbar.tsx          # Top nav: Exit button + section links
-│   │
-│   └── transitions/
-│       └── CRTPowerTransition.tsx # Power on/off effect between pages
+├── fluid/
+│   ├── FluidSimulation.tsx # WebGL Navier-Stokes fluid sim canvas
+│   ├── DitherPostProcess.tsx # Bayer dithering shader applied to fluid output
+│   └── shaders/
+│       ├── advection.glsl
+│       ├── divergence.glsl
+│       ├── pressure.glsl
+│       ├── gradient.glsl
+│       ├── splat.glsl      # Mouse interaction injection
+│       └── dither.glsl     # Ordered dithering post-process
 │
-├── config/
-│   └── projects.ts             # Project data (typed config)
+├── text/
+│   ├── ScrambleText.tsx    # Simultaneous character scramble animation
+│   ├── ASCIITitle.tsx      # Large ASCII art text (Hello World/User/Seb/etc.)
+│   └── BootSequence.tsx    # Terminal bootup command flicker
 │
-├── hooks/
-│   ├── useFluidSim.ts          # WebGL fluid simulation hook
-│   ├── useScrambleText.ts      # Text scramble animation hook
-│   ├── useSectionObserver.ts   # Intersection Observer for scroll detection
-│   ├── useMouseParallax.ts     # Mouse position tracking for glossy reflection
-│   └── useCRTTransition.ts     # Power on/off transition state
+├── sections/
+│   ├── SectionWrapper.tsx  # Scroll-triggered scramble + blur logic
+│   ├── HeroSection.tsx
+│   ├── SkillsSection.tsx
+│   ├── ProjectsSection.tsx
+│   ├── EducationSection.tsx
+│   └── ContactSection.tsx  # No scramble/blur
 │
-├── lib/
-│   ├── webgl/
-│   │   ├── createProgram.ts    # WebGL shader compilation utilities
-│   │   ├── framebuffer.ts      # FBO management for multi-pass rendering
-│   │   └── textures.ts         # Texture creation helpers
-│   └── ascii.ts                # ASCII art text generation utilities
+├── projects/
+│   ├── ProjectCard.tsx     # Card: title, video, description, tech tags
+│   └── ProjectGrid.tsx     # Grid/layout of project cards
 │
-├── types/
-│   └── project.ts              # Project interface definition
+├── nav/
+│   └── Navbar.tsx          # Top nav: Exit button + section links
 │
-└── styles/
-    ├── globals.css              # Base styles, CRT CSS variables
-    └── crt.module.css           # Scoped CRT overlay effects (scanlines, noise)
+└── transitions/
+    └── CRTPowerTransition.tsx # Power on/off effect between pages
+
+config/
+└── projects.ts             # Project data (typed config)
+
+hooks/
+├── useFluidSim.ts          # WebGL fluid simulation hook
+├── useScrambleText.ts      # Text scramble animation hook
+├── useSectionObserver.ts   # Intersection Observer for scroll detection
+├── useMouseParallax.ts     # Mouse position tracking for glossy reflection
+└── useCRTTransition.ts     # Power on/off transition state
+
+lib/
+├── webgl/
+│   ├── createProgram.ts    # WebGL shader compilation utilities
+│   ├── framebuffer.ts      # FBO management for multi-pass rendering
+│   └── textures.ts         # Texture creation helpers
+└── ascii.ts                # ASCII art text generation utilities
+
+types/
+└── project.ts              # Project interface definition
 ```
 
 ---
@@ -232,7 +227,8 @@ Mouse Input → Splat (inject velocity/dye)
     → Advection → Divergence → Pressure Solve → Gradient Subtract
     → Fluid Density Texture (smooth)
     → PASS 1: Dither Fragment Shader (Bayer 8x8 ordered dithering)
-    → PASS 2: CRT Effects (scanlines + noise + barrel distortion)
+    → PASS 2: CRT Effects (scanlines + noise + vignette)
+    → PASS 3: Barrel distortion shader (applied last)
     → Final Output to Canvas
 ```
 
@@ -335,7 +331,7 @@ interface Project {
 ## Project Data Config
 
 ```typescript
-// src/config/projects.ts
+// config/projects.ts
 
 import { Project } from '@/types/project';
 
@@ -357,18 +353,18 @@ export const projects: Project[] = [
 
 ## Phased Build Plan
 
-### Phase 1 — Foundation & CRT Shell (Week 1–2)
+### Phase 1 — Foundation & CRT Shell
 **Goal:** Next.js project scaffold with CRT frame rendering correctly
 
-1. Initialize Next.js 14 project with TypeScript, Tailwind, App Router
+1. Initialize Next.js 16 project with TypeScript, Tailwind v4, App Router
 2. Set up VT323 font via `next/font/google`
-3. Build `CRTFrame` component — bezel, rounded screen area, CSS structure
-4. Build `CRTScreen` component — scanline overlay, vignette (CSS-based first)
+3. Build `CRTFrame` component — bezel, padding, outer shadows
+4. Build `CRTScreen` component — rounded screen area, overflow hidden
 5. Build `GlossyReflection` — static arc overlay + `useMouseParallax` hook
 6. Set up color palette as CSS variables / Tailwind theme
 7. Create basic page routing: `/`, `/home`, `/projects/[slug]`
 
-### Phase 2 — Start Page Core (Week 2–3)
+### Phase 2 — Start Page Core
 **Goal:** Start page with boot sequence, ASCII title, and Enter button (no fluid sim yet)
 
 1. Build `BootSequence` component — typewriter-style terminal commands
@@ -377,50 +373,44 @@ export const projects: Project[] = [
 4. Style the "Enter" button with CRT aesthetic
 5. Implement basic page transition (placeholder before full CRT power effect)
 
-### Phase 3 — Fluid Simulation + Dither (Week 3–5)
+### Phase 3 — Fluid Simulation + Dither
 **Goal:** WebGL fluid sim running with dither post-process on Start Page
 
 1. Set up WebGL 2.0 context and shader compilation utilities
 2. Implement Navier-Stokes solver (advection, divergence, pressure, gradient)
 3. Implement mouse interaction (splat injection)
 4. Build Bayer dithering fragment shader
-5. Chain render passes: fluid → dither → output
-6. Add CRT shader passes (scanlines, barrel distortion, noise)
-7. Performance tuning — resolution scaling, iteration count
-8. Mobile detection → fall back to static dithered background
+5. Chain render passes: fluid → dither → CRT → barrel distortion → output
+6. Performance tuning — resolution scaling, iteration count
+7. Mobile detection → fall back to static dithered background
 
-### Phase 4 — Home Page Sections (Week 5–7)
+### Phase 4 — Home Page Sections
 **Goal:** All 5 sections with scroll-triggered scramble + blur
 
 1. Build `SectionWrapper` with Intersection Observer logic
 2. Build `Navbar` with Exit button + section scroll links
-3. Build `HeroSection` layout and content
-4. Build `SkillsSection` layout and content
-5. Build `ProjectsSection` with `ProjectCard` grid
-6. Build `EducationSection` layout
-7. Build `ContactSection` (no scramble/blur)
-8. Implement section blur transitions via Framer Motion
-9. Wire navbar links to scroll + trigger scramble
+3. Build all section components
+4. Implement section blur transitions via Framer Motion
+5. Wire navbar links to scroll + trigger scramble
 
-### Phase 5 — Transitions & Polish (Week 7–8)
+### Phase 5 — Transitions & Polish
 **Goal:** CRT power transition, barrel distortion shader, final polish
 
 1. Build `CRTPowerTransition` — power-off and power-on sequences
 2. Wire transition between Start Page ↔ Home Page
 3. Implement barrel distortion as WebGL shader on CRT screen content
 4. Add project detail page (`/projects/[slug]`) basic layout
-5. Add video loading states for project cards
-6. Responsive adjustments — mobile bezel, font sizes, section layouts
-7. Performance audit — Lighthouse, WebGL profiling
-8. Cross-browser testing (Chrome, Firefox, Safari, Edge)
+5. Responsive adjustments — mobile bezel, font sizes, section layouts
+6. Performance audit — Lighthouse, WebGL profiling
+7. Cross-browser testing (Chrome, Firefox, Safari, Edge)
 
-### Phase 6 — Content & Deployment (Week 8–9)
+### Phase 6 — Content & Deployment
 **Goal:** Real content, final QA, deploy to Vercel
 
-1. Add real project data to `projects.ts`
+1. Add real project data to `config/projects.ts`
 2. Record/prepare project preview videos (webm + mp4 fallback)
 3. Write section copy (hero intro, skills list, education/experience)
-4. Fine-tune animation timings (scramble speed, blur duration, transition pacing)
+4. Fine-tune animation timings
 5. SEO: meta tags, Open Graph, structured data
 6. Deploy to Vercel, configure custom domain
 7. Final cross-device QA
@@ -445,16 +435,15 @@ export const projects: Project[] = [
 ```json
 {
   "dependencies": {
-    "next": "^14.x",
-    "react": "^18.x",
-    "framer-motion": "^11.x",
-    "clsx": "^2.x"
+    "next": "^16.x",
+    "react": "^19.x",
+    "framer-motion": "^12.x"
   },
   "devDependencies": {
     "typescript": "^5.x",
-    "tailwindcss": "^3.x",
-    "@types/react": "^18.x",
-    "raw-loader": "^4.x"       // for importing .glsl files
+    "tailwindcss": "^4.x",
+    "@types/react": "^19.x",
+    "raw-loader": "^4.x"
   }
 }
 ```
@@ -468,6 +457,6 @@ Minimal dependency footprint — the fluid sim, dithering, and CRT effects are a
 1. **ASCII art generation** — pre-built text blocks vs. runtime generation with figlet.js?
 2. **Project detail page design** — same CRT frame? Full-page layout or modal?
 3. **Sound effects?** — CRT hum, keyboard clicks, static burst on transitions (opt-in)
-4. **Dark mode toggle?** — probably not needed given the aesthetic, but green phosphor variant?
+4. **Green phosphor variant?** — alternative color scheme toggle
 5. **Analytics** — Vercel Analytics or a lightweight alternative?
 6. **Accessibility** — `prefers-reduced-motion` media query to disable animations for users who need it
